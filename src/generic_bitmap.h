@@ -5,7 +5,7 @@
  * https://github.com/greensky00
  *
  * Generic Bitmap
- * Version: 0.1.0
+ * Version: 0.1.1
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -47,7 +47,11 @@ public:
     {
         // Ceiling.
         memorySizeByte = (numBits + 7) / 8;
-        myBitmap = (uint8_t*)calloc(1, memorySizeByte);
+        if (memorySizeByte) {
+            myBitmap = (uint8_t*)calloc(1, memorySizeByte);
+        } else {
+            myBitmap = nullptr;
+        }
 
         init();
     }
@@ -75,6 +79,20 @@ public:
     ~GenericBitmap() {
         free(myBitmap);
         delete[] locks;
+    }
+
+    /**
+     * Replace internal bitmap with given memory region.
+     * It will take ownership without memory copy.
+     */
+    void moveFrom(void* memory_ptr,
+                  size_t memory_ptr_size,
+                  size_t num_bits)
+    {
+        free(myBitmap);
+        myBitmap = (uint8_t*)memory_ptr;
+        memorySizeByte = memory_ptr_size;
+        numBits = num_bits;
     }
 
     /**

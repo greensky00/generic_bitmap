@@ -246,6 +246,34 @@ int dump_load_test(size_t num) {
     return 0;
 }
 
+int dump_move_test(size_t num) {
+    GenericBitmap my_bitmap(num);
+
+    std::unordered_set<size_t> set_list;
+    for (size_t ii=0; ii<num/2; ++ii) {
+        size_t idx = rand() % num;
+        set_list.insert(idx);
+        my_bitmap.set(idx, true);
+    }
+
+    size_t buf_len = my_bitmap.getMemorySize();
+    void* tmp_buf = malloc(buf_len);
+    memcpy(tmp_buf, my_bitmap.getPtr(), buf_len);
+
+    GenericBitmap new_bitmap(0);
+    new_bitmap.moveFrom(tmp_buf, buf_len, num);
+
+    for (size_t ii=0; ii<num; ++ii) {
+        auto entry = set_list.find(ii);
+        if (entry == set_list.end()) {
+            CHK_FALSE( new_bitmap.get(ii) );
+        } else {
+            CHK_TRUE( new_bitmap.get(ii) );
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char** argv) {
     TestSuite ts(argc, argv);;
 
@@ -269,6 +297,10 @@ int main(int argc, char** argv) {
 
     ts.doTest("dump load test",
               dump_load_test,
+              TestRange<size_t>({1000000}));
+
+    ts.doTest("dump move test",
+              dump_move_test,
               TestRange<size_t>({1000000}));
 
     return 0;
