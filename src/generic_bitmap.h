@@ -5,7 +5,7 @@
  * https://github.com/greensky00
  *
  * Generic Bitmap
- * Version: 0.1.1
+ * Version: 0.1.2
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -170,7 +170,7 @@ private:
     inline void parse(uint64_t idx,
                       uint64_t& lock_idx_out,
                       uint64_t& offset_out,
-                      uint64_t& byte_idx_out)
+                      uint64_t& byte_idx_out) const
     {
         lock_idx_out = idx & (numThreads - 1);
         offset_out = idx & 0x7;
@@ -178,7 +178,7 @@ private:
     }
 
     inline bool getInternal(uint64_t byte_idx,
-                            uint64_t offset)
+                            uint64_t offset) const
     {
         uint8_t val = myBitmap[byte_idx];
         return val & masks8[offset];
